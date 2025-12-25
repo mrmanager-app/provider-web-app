@@ -11,7 +11,7 @@ const Header = () => {
           Mr. Manager
         </span>
       </div>
-      <div className="flex items-center gap-4.5">
+      {/* <div className="flex items-center gap-4.5">
         <Avatar className="size-10">
           <AvatarImage src="https://github.com/shadcn.png" />
           <AvatarFallback>CN</AvatarFallback>
@@ -24,7 +24,7 @@ const Header = () => {
             email@example.com
           </span>
         </div>
-      </div>
+      </div> */}
     </header>
   );
 };
