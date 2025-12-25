@@ -54,7 +54,7 @@ function Button({
       disabled={disabled}
       className={cn(
         buttonVariants({ variant, size, className }),
-        disabled && "bg-d pointer-events-none opacity-50",
+        disabled && "bg-disabled pointer-events-none opacity-50",
       )}
       {...props}
     />
