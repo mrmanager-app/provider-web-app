@@ -28,7 +28,11 @@ import type {
   PasswordFormProps,
   CreatePasswordFormProps,
 } from "../types";
-import { IconCircleCheck, IconCircleX, IconAlertCircle } from "@tabler/icons-react";
+import {
+  IconCircleCheck,
+  IconCircleX,
+  IconAlertCircle,
+} from "@tabler/icons-react";
 
 function FormHeader({ title, description, className }: FormHeaderProps) {
   return (
@@ -132,7 +136,7 @@ export function OtpForm({
   const handleSubmit = async () => {
     const result = otpSchema.safeParse(otp);
     if (!result.success) {
-      // setHasError(true);
+      setHasError(true);
       return;
     }
 
@@ -144,7 +148,6 @@ export function OtpForm({
       setHasError(true);
     } finally {
       setIsSubmitting(false);
-      
     }
   };
 
@@ -332,16 +335,28 @@ function PasswordRequirements({ password }: { password: string }) {
   const requirements = validatePasswordRequirements(password);
 
   const requirementItems = [
-    { key: "hasMinLength" as const, label: PASSWORD_REQUIREMENT_LABELS.hasMinLength },
-    { key: "hasSpecialChar" as const, label: PASSWORD_REQUIREMENT_LABELS.hasSpecialChar },
+    {
+      key: "hasMinLength" as const,
+      label: PASSWORD_REQUIREMENT_LABELS.hasMinLength,
+    },
+    {
+      key: "hasSpecialChar" as const,
+      label: PASSWORD_REQUIREMENT_LABELS.hasSpecialChar,
+    },
     { key: "hasNumber" as const, label: PASSWORD_REQUIREMENT_LABELS.hasNumber },
-    { key: "hasUppercase" as const, label: PASSWORD_REQUIREMENT_LABELS.hasUppercase },
-    { key: "hasLowercase" as const, label: PASSWORD_REQUIREMENT_LABELS.hasLowercase },
+    {
+      key: "hasUppercase" as const,
+      label: PASSWORD_REQUIREMENT_LABELS.hasUppercase,
+    },
+    {
+      key: "hasLowercase" as const,
+      label: PASSWORD_REQUIREMENT_LABELS.hasLowercase,
+    },
   ];
 
   return (
-    <div className="border border-border rounded-lg p-4 space-y-3">
-      <p className="text-sm text-foreground font-medium">
+    <div className="border-border space-y-3 rounded-lg border p-4">
+      <p className="text-foreground text-sm font-medium">
         Your password must have the following:
       </p>
       <div className="grid grid-cols-2 gap-2">
@@ -352,9 +367,13 @@ function PasswordRequirements({ password }: { password: string }) {
               {isMet ? (
                 <IconCircleCheck className="size-4 text-green-500" />
               ) : (
-                <IconCircleX className="size-4 text-destructive" />
+                <IconCircleX className="text-destructive size-4" />
               )}
-              <span className={cn(isMet ? "text-foreground" : "text-muted-foreground")}>
+              <span
+                className={cn(
+                  isMet ? "text-foreground" : "text-muted-foreground",
+                )}
+              >
                 {label}
               </span>
             </div>
@@ -399,10 +418,11 @@ export function CreatePasswordForm({
         <form.Field name="password">
           {(field) => {
             const isInvalid =
-              field.state.meta.isTouched && 
+              field.state.meta.isTouched &&
               field.state.meta.errors.length > 0 &&
               !isPasswordValid(field.state.value);
-            const isValid = field.state.meta.isTouched && isPasswordValid(field.state.value);
+            const isValid =
+              field.state.meta.isTouched && isPasswordValid(field.state.value);
             return (
               <div className="flex flex-col gap-2">
                 <Label htmlFor={field.name} className="text-foreground">
@@ -418,7 +438,7 @@ export function CreatePasswordForm({
                   className={cn(
                     "border-border bg-card",
                     isInvalid && "border-destructive",
-                    isValid && "border-green-500"
+                    isValid && "border-green-500",
                   )}
                   aria-invalid={isInvalid}
                   showValid={isValid}
@@ -435,7 +455,7 @@ export function CreatePasswordForm({
             const hasValue = field.state.value.length > 0;
             const isMatch = hasValue && field.state.value === passwordValue;
             const isMismatch = hasValue && field.state.value !== passwordValue;
-            
+
             return (
               <div className="flex flex-col gap-2">
                 <Label htmlFor={field.name} className="text-foreground">
@@ -451,12 +471,12 @@ export function CreatePasswordForm({
                   className={cn(
                     "border-border bg-card",
                     isMismatch && "border-destructive",
-                    isMatch && "border-green-500"
+                    isMatch && "border-green-500",
                   )}
                   aria-invalid={isMismatch}
                 />
                 {isMismatch && (
-                  <p className="text-destructive text-sm flex items-center gap-1">
+                  <p className="text-destructive flex items-center gap-1 text-sm">
                     <IconAlertCircle className="size-4" />
                     Passwords Don't Match
                   </p>
@@ -481,7 +501,6 @@ export function CreatePasswordForm({
           </Button>
         )}
       </form.Subscribe>
-
-        </form>
+    </form>
   );
 }
