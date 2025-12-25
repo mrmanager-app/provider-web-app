@@ -7,12 +7,10 @@ import {
   AuthCardHeader,
   AuthCardFooter,
 } from "./auth-card";
-import {
-  IdentifierForm,
-  OtpForm,
-  PasswordForm,
-  CreatePasswordForm,
-} from "./auth-form";
+import { OtpForm } from "./forms/otp-form";
+import { CreatePasswordForm } from "./forms/create-password-form";
+import { PasswordForm } from "./forms/password-form";
+import { IdentifierForm } from "./forms/identifier-form";
 import {
   SocialAuthRoot,
   SocialAuthDivider,
