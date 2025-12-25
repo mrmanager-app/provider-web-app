@@ -13,14 +13,28 @@ export const AUTH_MESSAGES = {
     description: "Sign up to start managing your sessions and payments.",
   },
   otp: {
-    title: "Enter the 4-digit OTP sent to your Mobile",
-    getDescription: (phone: string) => `We've sent 4-digit OTP to ${phone}.`,
+    title: "Enter the 4-digit OTP",
+    getDescription: (identifier: string) => `We've sent a 4-digit OTP to ${identifier}.`,
   },
   password: {
     title: "Enter your password",
     getDescription: (email: string) =>
       `Enter the password for the account linked to this ${email}`,
   },
+  createPassword: {
+    title: "Create a password",
+    getDescription: (email: string) =>
+      `Create a password for your provider account linked to this ${email}`,
+  },
+} as const;
+
+// Password requirements labels
+export const PASSWORD_REQUIREMENT_LABELS = {
+  hasMinLength: "At least 8 characters",
+  hasUppercase: "1 uppercase",
+  hasLowercase: "1 lowercase",
+  hasNumber: "1 or more numbers",
+  hasSpecialChar: "1 or more special characters",
 } as const;
 
 // Error messages

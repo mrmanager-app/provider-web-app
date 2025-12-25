@@ -43,3 +43,10 @@ export interface PasswordFormProps {
   submitLabel?: string;
   className?: string;
 }
+
+export interface CreatePasswordFormProps {
+  identifier: string;
+  onSubmit: (password: string) => void | Promise<void>;
+  submitLabel?: string;
+  className?: string;
+}

@@ -7,7 +7,10 @@ import {
   AuthCardHeader,
   AuthCardFooter,
 } from "@/features/auth/components/auth-card";
-import { OtpForm, PasswordForm } from "@/features/auth/components/auth-form";
+import {
+  OtpForm,
+  CreatePasswordForm,
+} from "@/features/auth/components/auth-form";
 import {
   SocialAuthRoot,
   SocialAuthDivider,
@@ -21,27 +24,31 @@ import { SignupForm } from "@/features/auth/components/signup-form";
 
 export default function SignupPage() {
   const { state, setIdentifier, setMethod, goToStep, reset } = useAuthFlow();
-  const [fullName, setFullName] = React.useState("");
 
-  const handleSignupSubmit = (data: {
-    fullName: string;
-    emailOrPhone: string;
-  }) => {
+  const handleSignupSubmit = (data: { emailOrPhone: string }) => {
     const method = detectAuthMethod(data.emailOrPhone);
     if (!method) return;
 
-    setFullName(data.fullName);
     setIdentifier(data.emailOrPhone);
     setMethod(method);
-    goToStep(method === "phone" ? "otp" : "password");
+    // Always go to OTP first for verification
+    goToStep("otp");
 
     console.log("Signup initiated:", data);
-    // TODO: Send OTP or proceed to password creation
+    // TODO: Send OTP to email or phone
   };
 
   const handleOtpSubmit = async (otp: string) => {
     console.log("OTP verified:", otp, "for:", state.identifier);
-    // TODO: Verify OTP and create account
+
+    // If email was used, proceed to password creation
+    if (state.method === "email") {
+      goToStep("password");
+    } else {
+      // For phone, account is verified - complete signup
+      console.log("Phone signup complete for:", state.identifier);
+      // TODO: Complete phone signup
+    }
   };
 
   const handleResendOtp = async () => {
@@ -51,7 +58,6 @@ export default function SignupPage() {
 
   const handlePasswordSubmit = async (password: string) => {
     console.log("Creating account with password:", {
-      fullName,
       email: state.identifier,
       password,
     });
@@ -84,10 +90,9 @@ export default function SignupPage() {
     return (
       <AuthCardRoot>
         <AuthCardBody>
-          <PasswordForm
+          <CreatePasswordForm
             identifier={state.identifier}
             onSubmit={handlePasswordSubmit}
-            onBack={reset}
             submitLabel="Create Account"
           />
         </AuthCardBody>

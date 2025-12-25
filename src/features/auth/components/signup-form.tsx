@@ -9,10 +9,9 @@ import { signupFormSchema } from "../schemas";
 
 interface SignupFormProps {
   onSubmit: (data: {
-    fullName: string;
     emailOrPhone: string;
   }) => void | Promise<void>;
-  defaultValues?: { fullName?: string; emailOrPhone?: string };
+  defaultValues?: { emailOrPhone?: string };
   submitLabel?: string;
   className?: string;
   children?: React.ReactNode;
@@ -27,7 +26,6 @@ export function SignupForm({
 }: SignupFormProps) {
   const form = useForm({
     defaultValues: {
-      fullName: defaultValues?.fullName ?? "",
       emailOrPhone: defaultValues?.emailOrPhone ?? "",
     },
     validators: {
@@ -47,37 +45,6 @@ export function SignupForm({
         form.handleSubmit();
       }}
     >
-      <form.Field name="fullName">
-        {(field) => {
-          const isInvalid =
-            field.state.meta.isTouched && field.state.meta.errors.length > 0;
-          return (
-            <div className="flex flex-col gap-2">
-              <Label htmlFor={field.name} className="text-foreground">
-                Full Name
-              </Label>
-              <Input
-                id={field.name}
-                name={field.name}
-                type="text"
-                placeholder="Enter your full name"
-                value={field.state.value}
-                onChange={(e) => field.handleChange(e.target.value)}
-                onBlur={field.handleBlur}
-                className="border-border bg-card"
-                aria-invalid={isInvalid}
-              />
-              {isInvalid && (
-                <p className="text-destructive text-sm">
-                  {field.state.meta.errors[0]?.message ??
-                    String(field.state.meta.errors[0])}
-                </p>
-              )}
-            </div>
-          );
-        }}
-      </form.Field>
-
       <form.Field name="emailOrPhone">
         {(field) => {
           const isInvalid =

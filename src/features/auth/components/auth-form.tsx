@@ -11,14 +11,24 @@ import {
   identifierFormSchema,
   passwordFormSchema,
   otpSchema,
+  createPasswordFormSchema,
+  validatePasswordRequirements,
+  isPasswordValid,
 } from "../schemas";
-import { AUTH_MESSAGES, OTP_LENGTH, OTP_RESEND_TIMEOUT } from "../constants";
+import {
+  AUTH_MESSAGES,
+  OTP_LENGTH,
+  OTP_RESEND_TIMEOUT,
+  PASSWORD_REQUIREMENT_LABELS,
+} from "../constants";
 import type {
   FormHeaderProps,
   IdentifierFormProps,
   OtpFormProps,
   PasswordFormProps,
+  CreatePasswordFormProps,
 } from "../types";
+import { IconCircleCheck, IconCircleX, IconAlertCircle } from "@tabler/icons-react";
 
 function FormHeader({ title, description, className }: FormHeaderProps) {
   return (
@@ -28,10 +38,6 @@ function FormHeader({ title, description, className }: FormHeaderProps) {
     </div>
   );
 }
-
-// ============================================
-// IDENTIFIER FORM (Email/Phone)
-// ============================================
 
 export function IdentifierForm({
   onSubmit,
@@ -109,10 +115,6 @@ export function IdentifierForm({
   );
 }
 
-// ============================================
-// OTP FORM
-// ============================================
-
 export function OtpForm({
   identifier,
   onSubmit,
@@ -130,7 +132,7 @@ export function OtpForm({
   const handleSubmit = async () => {
     const result = otpSchema.safeParse(otp);
     if (!result.success) {
-      setHasError(true);
+      // setHasError(true);
       return;
     }
 
@@ -142,6 +144,7 @@ export function OtpForm({
       setHasError(true);
     } finally {
       setIsSubmitting(false);
+      
     }
   };
 
@@ -209,10 +212,6 @@ export function OtpForm({
     </div>
   );
 }
-
-// ============================================
-// PASSWORD FORM
-// ============================================
 
 export function PasswordForm({
   identifier,
@@ -326,5 +325,163 @@ export function PasswordForm({
         </p>
       )}
     </form>
+  );
+}
+
+function PasswordRequirements({ password }: { password: string }) {
+  const requirements = validatePasswordRequirements(password);
+
+  const requirementItems = [
+    { key: "hasMinLength" as const, label: PASSWORD_REQUIREMENT_LABELS.hasMinLength },
+    { key: "hasSpecialChar" as const, label: PASSWORD_REQUIREMENT_LABELS.hasSpecialChar },
+    { key: "hasNumber" as const, label: PASSWORD_REQUIREMENT_LABELS.hasNumber },
+    { key: "hasUppercase" as const, label: PASSWORD_REQUIREMENT_LABELS.hasUppercase },
+    { key: "hasLowercase" as const, label: PASSWORD_REQUIREMENT_LABELS.hasLowercase },
+  ];
+
+  return (
+    <div className="border border-border rounded-lg p-4 space-y-3">
+      <p className="text-sm text-foreground font-medium">
+        Your password must have the following:
+      </p>
+      <div className="grid grid-cols-2 gap-2">
+        {requirementItems.map(({ key, label }) => {
+          const isMet = requirements[key];
+          return (
+            <div key={key} className="flex items-center gap-2 text-sm">
+              {isMet ? (
+                <IconCircleCheck className="size-4 text-green-500" />
+              ) : (
+                <IconCircleX className="size-4 text-destructive" />
+              )}
+              <span className={cn(isMet ? "text-foreground" : "text-muted-foreground")}>
+                {label}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+export function CreatePasswordForm({
+  identifier,
+  onSubmit,
+  submitLabel = "Continue",
+  className,
+}: CreatePasswordFormProps) {
+  const form = useForm({
+    defaultValues: { password: "", confirmPassword: "" },
+    validators: {
+      onChange: createPasswordFormSchema,
+      onBlur: createPasswordFormSchema,
+    },
+    onSubmit: async ({ value }) => {
+      await onSubmit(value.password);
+    },
+  });
+
+  return (
+    <form
+      className={cn("flex flex-col gap-6", className)}
+      onSubmit={(e) => {
+        e.preventDefault();
+        form.handleSubmit();
+      }}
+    >
+      <FormHeader
+        title={AUTH_MESSAGES.createPassword.title}
+        description={AUTH_MESSAGES.createPassword.getDescription(identifier)}
+      />
+
+      <div className="space-y-4">
+        <form.Field name="password">
+          {(field) => {
+            const isInvalid =
+              field.state.meta.isTouched && 
+              field.state.meta.errors.length > 0 &&
+              !isPasswordValid(field.state.value);
+            const isValid = field.state.meta.isTouched && isPasswordValid(field.state.value);
+            return (
+              <div className="flex flex-col gap-2">
+                <Label htmlFor={field.name} className="text-foreground">
+                  Password
+                </Label>
+                <PasswordInput
+                  id={field.name}
+                  name={field.name}
+                  placeholder="Enter your password"
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  onBlur={field.handleBlur}
+                  className={cn(
+                    "border-border bg-card",
+                    isInvalid && "border-destructive",
+                    isValid && "border-green-500"
+                  )}
+                  aria-invalid={isInvalid}
+                  showValid={isValid}
+                />
+                <PasswordRequirements password={field.state.value} />
+              </div>
+            );
+          }}
+        </form.Field>
+
+        <form.Field name="confirmPassword">
+          {(field) => {
+            const passwordValue = form.getFieldValue("password");
+            const hasValue = field.state.value.length > 0;
+            const isMatch = hasValue && field.state.value === passwordValue;
+            const isMismatch = hasValue && field.state.value !== passwordValue;
+            
+            return (
+              <div className="flex flex-col gap-2">
+                <Label htmlFor={field.name} className="text-foreground">
+                  Confirm Password
+                </Label>
+                <PasswordInput
+                  id={field.name}
+                  name={field.name}
+                  placeholder="Re-enter password"
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  onBlur={field.handleBlur}
+                  className={cn(
+                    "border-border bg-card",
+                    isMismatch && "border-destructive",
+                    isMatch && "border-green-500"
+                  )}
+                  aria-invalid={isMismatch}
+                />
+                {isMismatch && (
+                  <p className="text-destructive text-sm flex items-center gap-1">
+                    <IconAlertCircle className="size-4" />
+                    Passwords Don't Match
+                  </p>
+                )}
+              </div>
+            );
+          }}
+        </form.Field>
+      </div>
+
+      <form.Subscribe
+        selector={(state) => [state.canSubmit, state.isSubmitting]}
+      >
+        {([canSubmit, isSubmitting]) => (
+          <Button
+            type="submit"
+            disabled={!canSubmit}
+            className="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer"
+            size="lg"
+          >
+            {isSubmitting ? "Loading..." : submitLabel}
+          </Button>
+        )}
+      </form.Subscribe>
+
+        </form>
   );
 }
