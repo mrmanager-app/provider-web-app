@@ -1,28 +1,30 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import type { AuthMethod, AuthState, AuthStep } from "../types";
-import { detectAuthMethod } from "../schemas";
+import type { AuthMethod, AuthStep } from "../types";
+
+interface AuthFlowState {
+  method: AuthMethod;
+  step: AuthStep;
+  identifier: string;
+}
 
 interface UseAuthFlowReturn {
-  state: AuthState;
+  state: AuthFlowState;
   setIdentifier: (value: string) => void;
   goToStep: (step: AuthStep) => void;
   setMethod: (method: AuthMethod) => void;
-  setLoading: (loading: boolean) => void;
   reset: () => void;
-  handleIdentifierSubmit: (identifier: string) => void;
 }
 
-const initialState: AuthState = {
+const initialState: AuthFlowState = {
   method: "email",
   step: "identifier",
   identifier: "",
-  isLoading: false,
 };
 
 export function useAuthFlow(): UseAuthFlowReturn {
-  const [state, setState] = useState<AuthState>(initialState);
+  const [state, setState] = useState<AuthFlowState>(initialState);
 
   const setIdentifier = useCallback((identifier: string) => {
     setState((prev) => ({ ...prev, identifier }));
@@ -36,24 +38,8 @@ export function useAuthFlow(): UseAuthFlowReturn {
     setState((prev) => ({ ...prev, method }));
   }, []);
 
-  const setLoading = useCallback((isLoading: boolean) => {
-    setState((prev) => ({ ...prev, isLoading }));
-  }, []);
-
   const reset = useCallback(() => {
     setState(initialState);
-  }, []);
-
-  const handleIdentifierSubmit = useCallback((identifier: string) => {
-    const method = detectAuthMethod(identifier);
-    if (!method) return;
-
-    setState((prev) => ({
-      ...prev,
-      identifier,
-      method,
-      step: method === "phone" ? "otp" : "password",
-    }));
   }, []);
 
   return {
@@ -61,8 +47,6 @@ export function useAuthFlow(): UseAuthFlowReturn {
     setIdentifier,
     goToStep,
     setMethod,
-    setLoading,
     reset,
-    handleIdentifierSubmit,
   };
 }

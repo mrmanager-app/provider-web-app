@@ -5,35 +5,25 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { signupFormSchema } from "../schemas";
+import { identifierFormSchema } from "../../schemas";
+import type { IdentifierFormProps } from "../../types";
 
-interface SignupFormProps {
-  onSubmit: (data: {
-    emailOrPhone: string;
-  }) => void | Promise<void>;
-  defaultValues?: { emailOrPhone?: string };
-  submitLabel?: string;
-  className?: string;
-  children?: React.ReactNode;
-}
-
-export function SignupForm({
+export function IdentifierForm({
   onSubmit,
-  defaultValues,
+  defaultValue = "",
+  label = "Email address or mobile number",
+  placeholder = "Enter your email or mobile number",
   submitLabel = "Continue",
   className,
-  children,
-}: SignupFormProps) {
+}: IdentifierFormProps) {
   const form = useForm({
-    defaultValues: {
-      emailOrPhone: defaultValues?.emailOrPhone ?? "",
-    },
+    defaultValues: { emailOrPhone: defaultValue },
     validators: {
-      onChange: signupFormSchema,
-      onBlur: signupFormSchema,
+      onChange: identifierFormSchema,
+      onBlur: identifierFormSchema,
     },
     onSubmit: async ({ value }) => {
-      await onSubmit(value);
+      await onSubmit(value.emailOrPhone);
     },
   });
 
@@ -52,13 +42,13 @@ export function SignupForm({
           return (
             <div className="flex flex-col gap-2">
               <Label htmlFor={field.name} className="text-foreground">
-                Email address or mobile number
+                {label}
               </Label>
               <Input
                 id={field.name}
                 name={field.name}
                 type="text"
-                placeholder="Enter your email or mobile number"
+                placeholder={placeholder}
                 value={field.state.value}
                 onChange={(e) => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
@@ -90,8 +80,7 @@ export function SignupForm({
           </Button>
         )}
       </form.Subscribe>
-
-      {children}
     </form>
   );
 }
+

@@ -3,13 +3,6 @@ export type AuthMethod = "email" | "phone";
 
 export type AuthStep = "identifier" | "otp" | "password";
 
-export interface AuthState {
-  method: AuthMethod;
-  step: AuthStep;
-  identifier: string;
-  isLoading: boolean;
-}
-
 // Form Component Props
 export interface FormHeaderProps {
   title: string;
