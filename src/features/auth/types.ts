@@ -12,10 +12,8 @@ export interface FormHeaderProps {
 
 export interface IdentifierFormProps {
   onSubmit: (value: string) => void | Promise<void>;
-  defaultValue?: string;
   label?: string;
   placeholder?: string;
-  submitLabel?: string;
   className?: string;
 }
 
@@ -42,4 +40,25 @@ export interface CreatePasswordFormProps {
   onSubmit: (password: string) => void | Promise<void>;
   submitLabel?: string;
   className?: string;
+}
+
+export interface OtpResponse {
+  otp: number;
+  verificationId: string;
+  authToken: string;
+}
+
+export interface VerifyOtpResponse {
+  message: string;
+  token: string;
+}
+
+export interface LoginResponse {
+  success: boolean;
+  token?: string;
+}
+
+export interface CreateAccountResponse {
+  success: boolean;
+  token?: string;
 }

@@ -7,6 +7,8 @@ interface AuthFlowState {
   method: AuthMethod;
   step: AuthStep;
   identifier: string;
+  verificationId: string;
+  authToken: string;
 }
 
 interface UseAuthFlowReturn {
@@ -14,6 +16,7 @@ interface UseAuthFlowReturn {
   setIdentifier: (value: string) => void;
   goToStep: (step: AuthStep) => void;
   setMethod: (method: AuthMethod) => void;
+  setOtpData: (verificationId: string, authToken: string) => void;
   reset: () => void;
 }
 
@@ -21,6 +24,8 @@ const initialState: AuthFlowState = {
   method: "email",
   step: "identifier",
   identifier: "",
+  verificationId: "",
+  authToken: "",
 };
 
 export function useAuthFlow(): UseAuthFlowReturn {
@@ -38,6 +43,13 @@ export function useAuthFlow(): UseAuthFlowReturn {
     setState((prev) => ({ ...prev, method }));
   }, []);
 
+  const setOtpData = useCallback(
+    (verificationId: string, authToken: string) => {
+      setState((prev) => ({ ...prev, verificationId, authToken }));
+    },
+    [],
+  );
+
   const reset = useCallback(() => {
     setState(initialState);
   }, []);
@@ -47,6 +59,7 @@ export function useAuthFlow(): UseAuthFlowReturn {
     setIdentifier,
     goToStep,
     setMethod,
+    setOtpData,
     reset,
   };
 }

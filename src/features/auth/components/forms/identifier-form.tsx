@@ -7,17 +7,16 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { identifierFormSchema } from "../../schemas";
 import type { IdentifierFormProps } from "../../types";
+import { IconLoader2 } from "@tabler/icons-react";
 
 export function IdentifierForm({
   onSubmit,
-  defaultValue = "",
   label = "Email address or mobile number",
   placeholder = "Enter your email or mobile number",
-  submitLabel = "Continue",
   className,
 }: IdentifierFormProps) {
   const form = useForm({
-    defaultValues: { emailOrPhone: defaultValue },
+    defaultValues: { emailOrPhone: "" },
     validators: {
       onChange: identifierFormSchema,
       onBlur: identifierFormSchema,
@@ -76,11 +75,17 @@ export function IdentifierForm({
             className="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer"
             size="lg"
           >
-            {isSubmitting ? "Loading..." : submitLabel}
+            {isSubmitting ? (
+              <>
+                Loading
+                <IconLoader2 className="size-4 animate-spin" />
+              </>
+            ) : (
+              "Continue"
+            )}
           </Button>
         )}
       </form.Subscribe>
     </form>
   );
 }
-

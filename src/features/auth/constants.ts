@@ -14,7 +14,8 @@ export const AUTH_MESSAGES = {
   },
   otp: {
     title: "Enter the 4-digit OTP",
-    getDescription: (identifier: string) => `We've sent a 4-digit OTP to ${identifier}.`,
+    getDescription: (identifier: string) =>
+      `We've sent a 4-digit OTP to ${identifier}.`,
   },
   password: {
     title: "Enter your password",
@@ -44,4 +45,5 @@ export const AUTH_ERRORS = {
   expiredOtp: "OTP has expired. Please request a new one.",
   networkError: "Network error. Please try again.",
   tooManyAttempts: "Too many attempts. Please try again later.",
+  unknown: "An unknown error occurred. Please try again.",
 } as const;

@@ -1,15 +1,22 @@
 import { AUTH_ERRORS } from "./constants";
+const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+import type {
+  OtpResponse,
+  VerifyOtpResponse,
+  LoginResponse,
+  CreateAccountResponse,
+} from "./types";
 
 // --- Error Types ---
 
 export interface AuthError {
-  code: keyof typeof AUTH_ERRORS | "unknown";
+  code: string;
   message: string;
   field?: string;
 }
 
 export class AuthApiError extends Error {
-  code: AuthError["code"];
+  code: string;
   field?: string;
 
   constructor({ code, message, field }: AuthError) {
@@ -20,70 +27,83 @@ export class AuthApiError extends Error {
   }
 }
 
-// --- Response Types ---
-
-export interface OtpResponse {
-  success: boolean;
-}
-
-export interface VerifyOtpResponse {
-  success: boolean;
-  token?: string;
-}
-
-export interface LoginResponse {
-  success: boolean;
-  token?: string;
-}
-
-export interface CreateAccountResponse {
-  success: boolean;
-  token?: string;
-}
-
-// --- API Functions ---
-
-/**
- * Request an OTP to be sent to the identifier (email or phone).
- */
 export async function requestOtp(identifier: string): Promise<OtpResponse> {
-  // TODO: Replace with actual API call
   console.log("API: requestOtp", identifier);
+  try {
+    const payload = {
+      phone: identifier,
+      country: 91,
+    };
+    const response = await fetch(`${API_URL}/sso/request-otp`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
 
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 500));
+    const data = await response.json();
 
-  // Placeholder success
-  return { success: true };
+    if (!response.ok) {
+      throw new AuthApiError({
+        code: data.code || "unknown",
+        message: data.message || AUTH_ERRORS.unknown,
+      });
+    }
+
+    return data;
+  } catch (error) {
+    if (error instanceof AuthApiError) throw error;
+
+    throw new AuthApiError({
+      code: "networkError",
+      message: AUTH_ERRORS.networkError,
+    });
+  }
 }
 
-/**
- * Verify the OTP code sent to the identifier.
- */
 export async function verifyOtp(
   identifier: string,
   otp: string,
+  verificationId: string,
+  authToken: string,
 ): Promise<VerifyOtpResponse> {
-  // TODO: Replace with actual API call
-  console.log("API: verifyOtp", { identifier, otp });
+  console.log("API: verifyOtp", { identifier, otp, verificationId });
+  try {
+    const payload = {
+      phone: identifier,
+      otp: otp,
+      verificationId: verificationId,
+    };
+    const response = await fetch(`${API_URL}/sso/provider-login/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+      body: JSON.stringify(payload),
+    });
 
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 500));
+    const data = await response.json();
 
-  // Placeholder: reject invalid OTP for demo
-  if (otp === "0000") {
+    if (!response.ok) {
+      throw new AuthApiError({
+        code: data.code || "unknown",
+        message: data.message || AUTH_ERRORS.unknown,
+      });
+    }
+
+    return data;
+  } catch (error) {
+    if (error instanceof AuthApiError) throw error;
+
     throw new AuthApiError({
-      code: "invalidOtp",
-      message: AUTH_ERRORS.invalidOtp,
+      code: "networkError",
+      message: AUTH_ERRORS.networkError,
     });
   }
-
-  return { success: true };
 }
 
-/**
- * Login with email/phone and password.
- */
 export async function loginWithPassword(
   identifier: string,
   password: string,
@@ -98,9 +118,6 @@ export async function loginWithPassword(
   return { success: true };
 }
 
-/**
- * Create a new account with email and password.
- */
 export async function createAccountEmail(
   identifier: string,
   password: string,
@@ -115,9 +132,6 @@ export async function createAccountEmail(
   return { success: true };
 }
 
-/**
- * Complete phone signup (after OTP verification).
- */
 export async function completePhoneSignup(
   identifier: string,
 ): Promise<CreateAccountResponse> {
@@ -130,27 +144,17 @@ export async function completePhoneSignup(
   return { success: true };
 }
 
-/**
- * Initiate Google OAuth flow.
- * Returns the URL to redirect to for OAuth.
- */
 export function getGoogleOAuthUrl(): string {
   // TODO: Replace with actual OAuth URL from backend
-  return "/api/auth/google";
+  return "https://www.google.com";
 }
 
-/**
- * Start Google OAuth by redirecting to the OAuth URL.
- */
 export function startGoogleOAuth(): void {
   const url = getGoogleOAuthUrl();
-  window.location.href = url;
+  console.log("Google OAuth URL:", url);
+  // window.location.href = url;
 }
 
-/**
- * Resend OTP to the identifier.
- */
 export async function resendOtp(identifier: string): Promise<OtpResponse> {
-  // Reuse the requestOtp function
   return requestOtp(identifier);
 }

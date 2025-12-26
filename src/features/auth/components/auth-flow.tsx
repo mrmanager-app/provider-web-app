@@ -1,6 +1,6 @@
 "use client";
-
 import * as React from "react";
+import { useMutation } from "@tanstack/react-query";
 import {
   AuthCardRoot,
   AuthCardBody,
@@ -23,12 +23,13 @@ import { AUTH_MESSAGES } from "../constants";
 import {
   requestOtp,
   verifyOtp,
-  resendOtp,
   loginWithPassword,
   createAccountEmail,
   completePhoneSignup,
   startGoogleOAuth,
 } from "../api";
+import { useRouter } from "next/navigation";
+import { setAuthCookie } from "@/lib/actions";
 
 export type AuthVariant = "login" | "signup";
 
@@ -37,7 +38,49 @@ interface AuthFlowProps {
 }
 
 export function AuthFlow({ variant }: AuthFlowProps) {
-  const { state, setIdentifier, setMethod, goToStep, reset } = useAuthFlow();
+  const { state, setIdentifier, setMethod, setOtpData, goToStep, reset } =
+    useAuthFlow();
+  const router = useRouter();
+  const requestOtpMutation = useMutation({ mutationFn: requestOtp });
+  const verifyOtpMutation = useMutation({
+    mutationFn: (params: {
+      identifier: string;
+      otp: string;
+      verificationId: string;
+      authToken: string;
+    }) =>
+      verifyOtp(
+        params.identifier,
+        params.otp,
+        params.verificationId,
+        params.authToken,
+      ),
+
+    onSuccess: async (data) => {
+      await setAuthCookie(data.token);
+      router.push("/dashboard");
+    },
+  });
+  const loginWithPasswordMutation = useMutation({
+    mutationFn: (params: { identifier: string; password: string }) =>
+      loginWithPassword(params.identifier, params.password),
+  });
+  const createAccountEmailMutation = useMutation({
+    mutationFn: (params: { identifier: string; password: string }) =>
+      createAccountEmail(params.identifier, params.password),
+  });
+  const completePhoneSignupMutation = useMutation({
+    mutationFn: completePhoneSignup,
+  });
+
+  // TODO: Add error messages to ui
+
+  // const activeError =
+  //   requestOtpMutation.error ||
+  //   verifyOtpMutation.error ||
+  //   loginWithPasswordMutation.error ||
+  //   createAccountEmailMutation.error ||
+  //   completePhoneSignupMutation.error;
 
   // --- Handlers ---
 
@@ -52,52 +95,88 @@ export function AuthFlow({ variant }: AuthFlowProps) {
       if (variant === "login") {
         // Login: email → password, phone → otp
         if (method === "phone") {
-          await requestOtp(identifier);
+          console.log("requesting otp for phone", identifier);
+          const response = await requestOtpMutation.mutateAsync(identifier);
+          setOtpData(response.verificationId, response.authToken);
         }
         goToStep(method === "phone" ? "otp" : "password");
       } else {
         // Signup: always go to OTP first for verification
-        await requestOtp(identifier);
+        const response = await requestOtpMutation.mutateAsync(identifier);
+        setOtpData(response.verificationId, response.authToken);
         goToStep("otp");
       }
     },
-    [variant, setIdentifier, setMethod, goToStep],
+    [
+      variant,
+      setIdentifier,
+      setMethod,
+      setOtpData,
+      goToStep,
+      requestOtpMutation,
+    ],
   );
 
   const handleOtpSubmit = React.useCallback(
     async (otp: string) => {
-      await verifyOtp(state.identifier, otp);
+      await verifyOtpMutation.mutateAsync({
+        identifier: state.identifier,
+        otp,
+        verificationId: state.verificationId,
+        authToken: state.authToken,
+      });
 
       if (variant === "signup" && state.method === "email") {
         // For email signup, proceed to password creation after OTP
         goToStep("password");
       } else if (variant === "signup" && state.method === "phone") {
         // For phone signup, complete flow
-        await completePhoneSignup(state.identifier);
+        await completePhoneSignupMutation.mutateAsync(state.identifier);
         // TODO: Redirect to dashboard or success page
       } else {
         // For login OTP, complete flow
         // TODO: Redirect to dashboard
       }
     },
-    [variant, state.identifier, state.method, goToStep],
+    [
+      variant,
+      state.identifier,
+      state.method,
+      state.verificationId,
+      state.authToken,
+      goToStep,
+      verifyOtpMutation,
+      completePhoneSignupMutation,
+    ],
   );
 
   const handleResendOtp = React.useCallback(async () => {
-    await resendOtp(state.identifier);
-  }, [state.identifier]);
+    const response = await requestOtpMutation.mutateAsync(state.identifier);
+    setOtpData(response.verificationId, response.authToken);
+  }, [state.identifier, requestOtpMutation, setOtpData]);
 
   const handlePasswordSubmit = React.useCallback(
     async (password: string) => {
       if (variant === "login") {
-        await loginWithPassword(state.identifier, password);
+        await loginWithPasswordMutation.mutateAsync({
+          identifier: state.identifier,
+          password,
+        });
         // TODO: Redirect to dashboard
       } else {
-        await createAccountEmail(state.identifier, password);
+        await createAccountEmailMutation.mutateAsync({
+          identifier: state.identifier,
+          password,
+        });
         // TODO: Redirect to dashboard or success page
       }
     },
-    [variant, state.identifier],
+    [
+      variant,
+      state.identifier,
+      loginWithPasswordMutation,
+      createAccountEmailMutation,
+    ],
   );
 
   const handleGoogleAuth = React.useCallback(() => {
