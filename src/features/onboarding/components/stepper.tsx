@@ -2,13 +2,9 @@
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
 import React from "react";
+import { ONBOARDING_STEPS_COPY } from "../constants";
 
-const steps = [
-  "Business Model",
-  "Basic Details",
-  "Additional Info",
-  "Add Team Member",
-];
+const steps = ONBOARDING_STEPS_COPY;
 
 interface StepperProps {
   currentStep: number;
@@ -77,14 +73,14 @@ const Stepper = ({ currentStep }: StepperProps) => {
   return (
     <div className="bg-card container mx-4 h-max max-w-7xl rounded-[24px] px-5 py-6 pb-10 sm:px-48">
       <div className="flex w-full items-center justify-between">
-        {steps.map((label, index) => {
+        {steps.map((step, index) => {
           const stepNumber = index + 1;
           const isActive = stepNumber === currentStep;
           const isCompleted = stepNumber < currentStep;
           const isLast = index === steps.length - 1;
 
           return (
-            <React.Fragment key={label}>
+            <React.Fragment key={step.label}>
               <div className="relative flex flex-col items-center justify-center">
                 <div
                   className={cn(
@@ -106,7 +102,7 @@ const Stepper = ({ currentStep }: StepperProps) => {
                       : "text-muted-foreground",
                   )}
                 >
-                  {label}
+                  {step.label}
                 </span>
               </div>
               {!isLast && (

@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Header = () => {
   return (
-    <header className="bg-card border-border flex h-16 w-full shrink-0 items-center justify-between border-b pt-5 pr-9 pb-4 pl-8">
+    <header className="bg-card border-border sticky top-0 z-10 flex h-16 w-full shrink-0 items-center justify-between border-b pt-5 pr-9 pb-4 pl-8">
       <div className="flex items-center gap-2">
         <div className="bg-primary flex size-8 items-center justify-center rounded-sm text-xs text-white">
           MR
