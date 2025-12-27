@@ -40,8 +40,9 @@ const StepLine = ({
           x2="100%"
           y2="50%"
           className={cn(
-            "text-primary stroke-current",
-            isCompleted || isActive ? "opacity-100" : "opacity-0",
+            "stroke-current",
+            isCompleted ? "text-success opacity-100" : "text-primary",
+            isActive ? "opacity-100" : isCompleted ? "" : "opacity-0",
           )}
           strokeWidth="2"
           initial={{ pathLength: 0, pathOffset: 0 }}
@@ -91,7 +92,7 @@ const Stepper = ({ currentStep }: StepperProps) => {
                     isActive
                       ? "bg-primary text-primary-foreground ring-primary ring-offset-card ring-2 ring-offset-2"
                       : isCompleted
-                        ? "bg-primary text-primary-foreground"
+                        ? "bg-success text-white"
                         : "bg-card text-muted-foreground border-border border-2",
                   )}
                 >
