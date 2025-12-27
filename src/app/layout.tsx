@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/provider/theme-provider";
-import { QueryProvider } from "@/components/provider/query-provider";
+import { ThemeProvider } from "@/provider/theme-provider";
+import { QueryProvider } from "@/provider/query-provider";
 
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-sans" });
 

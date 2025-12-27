@@ -1,4 +1,4 @@
-export { FormHeader } from "./form-header";
+export { CardHeader } from "@/components/shared/card-header";
 export { PasswordRequirements } from "./password-requirements";
 export { IdentifierForm } from "./identifier-form";
 export { OtpForm } from "./otp-form";

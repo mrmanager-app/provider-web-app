@@ -4,11 +4,15 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { OtpInput } from "../otp-input";
-import { useOtpTimer } from "../../hooks/use-otp-timer";
-import { otpSchema } from "../../schemas";
-import { AUTH_MESSAGES, OTP_LENGTH, OTP_RESEND_TIMEOUT } from "../../constants";
-import { FormHeader } from "./form-header";
-import type { OtpFormProps } from "../../types";
+import { useOtpTimer } from "@/features/auth/hooks/use-otp-timer";
+import { otpSchema } from "@/features/auth/schemas";
+import {
+  AUTH_MESSAGES,
+  OTP_LENGTH,
+  OTP_RESEND_TIMEOUT,
+} from "@/features/auth/constants";
+import { CardHeader } from "@/components/shared/card-header";
+import type { OtpFormProps } from "@/features/auth/types";
 
 export function OtpForm({
   identifier,
@@ -52,7 +56,7 @@ export function OtpForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)}>
-      <FormHeader
+      <CardHeader
         title={AUTH_MESSAGES.otp.title}
         description={AUTH_MESSAGES.otp.getDescription(identifier)}
       />
@@ -106,4 +110,3 @@ export function OtpForm({
     </div>
   );
 }
-

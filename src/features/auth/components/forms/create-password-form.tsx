@@ -5,12 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { PasswordInput } from "../password-input";
-import { createPasswordFormSchema, isPasswordValid } from "../../schemas";
-import { AUTH_MESSAGES } from "../../constants";
-import { FormHeader } from "./form-header";
+import {
+  createPasswordFormSchema,
+  isPasswordValid,
+} from "@/features/auth/schemas";
+import { AUTH_MESSAGES } from "@/features/auth/constants";
+import { CardHeader } from "@/components/shared/card-header";
 import { PasswordRequirements } from "./password-requirements";
 import { IconAlertCircle } from "@tabler/icons-react";
-import type { CreatePasswordFormProps } from "../../types";
+import type { CreatePasswordFormProps } from "@/features/auth/types";
 
 export function CreatePasswordForm({
   identifier,
@@ -37,7 +40,7 @@ export function CreatePasswordForm({
         form.handleSubmit();
       }}
     >
-      <FormHeader
+      <CardHeader
         title={AUTH_MESSAGES.createPassword.title}
         description={AUTH_MESSAGES.createPassword.getDescription(identifier)}
       />

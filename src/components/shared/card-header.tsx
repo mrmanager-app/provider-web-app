@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
-import type { FormHeaderProps } from "../../types";
+import type { CardHeaderProps } from "../../features/auth/types";
 
-export function FormHeader({ title, description, className }: FormHeaderProps) {
+export function CardHeader({ title, description, className }: CardHeaderProps) {
   return (
     <div className={cn("space-y-2 text-center", className)}>
       <h2 className="text-[32px] font-medium">{title}</h2>

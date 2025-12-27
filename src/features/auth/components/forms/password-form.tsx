@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { PasswordInput } from "../password-input";
-import { passwordFormSchema } from "../../schemas";
-import { AUTH_MESSAGES } from "../../constants";
-import { FormHeader } from "./form-header";
-import type { PasswordFormProps } from "../../types";
+import { passwordFormSchema } from "@/features/auth/schemas";
+import { AUTH_MESSAGES } from "@/features/auth/constants";
+import { CardHeader } from "@/components/shared/card-header";
+import type { PasswordFormProps } from "@/features/auth/types";
 
 export function PasswordForm({
   identifier,
@@ -39,7 +39,7 @@ export function PasswordForm({
         form.handleSubmit();
       }}
     >
-      <FormHeader
+      <CardHeader
         title={AUTH_MESSAGES.password.title}
         description={AUTH_MESSAGES.password.getDescription(identifier)}
       />

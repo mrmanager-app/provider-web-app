@@ -4,7 +4,7 @@ export type AuthMethod = "email" | "phone";
 export type AuthStep = "identifier" | "otp" | "password";
 
 // Form Component Props
-export interface FormHeaderProps {
+export interface CardHeaderProps {
   title: string;
   description: string;
   className?: string;
