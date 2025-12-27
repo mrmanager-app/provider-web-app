@@ -59,7 +59,7 @@ const BusinessModelStep = () => {
               <Card
                 key={option.id}
                 className={cn(
-                  "hover:ring-primary cursor-pointer rounded-[20px] transition-all duration-300 ease-in-out",
+                  "hover:ring-primary cursor-pointer rounded-[20px] transition-[ring] duration-300 ease-in-out",
                   selectedModel === option.id
                     ? "ring-primary bg-primary/8"
                     : "",
